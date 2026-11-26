@@ -1,0 +1,37 @@
+# Local run:  PGPASSWORD=<choose-one> docker compose up --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: analytics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${PGPASSWORD:?set PGPASSWORD before running}
+    ports: ["5432:5432"]
+
+  inventory:
+    build: ./services/inventory
+    environment: &pg
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: ${PGPASSWORD:?set PGPASSWORD before running}
+      PGDATABASE: analytics
+    depends_on: [db]
+    ports: ["8091:8091"]
+
+  payments:
+    build: ./services/payments
+    environment:
+      <<: *pg
+      INVENTORY_URL: http://inventory:8091
+    depends_on: [db, inventory]
+    ports: ["8092:8092"]
+
+  storefront:
+    build: ./services/storefront
+    environment:
+      <<: *pg
+      INVENTORY_URL: http://inventory:8091
+      PAYMENTS_URL: http://payments:8092
+    depends_on: [db, inventory, payments]
+    ports: ["8080:8080"]

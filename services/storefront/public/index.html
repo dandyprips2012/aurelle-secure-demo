@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aurelle</title>
+  <meta name="description" content="Everyday objects for the desk, the kitchen, the trail and everything between.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M6 30V15a10 10 0 0 1 20 0v15z' fill='%23E0D6F3'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <!-- Datadog Browser RUM: SDK from Datadog's CDN, settings in rum-config.js, start-up in rum.js -->
+  <script src="https://www.datadoghq-browser-agent.com/us1/v6/datadog-rum.js"></script>
+  <script src="/rum-config.js"></script>
+  <script src="/rum.js"></script>
+</head>
+<body>
+  <a class="skip" href="#collection">Skip to the collection</a>
+
+  <header class="top">
+    <a class="mark" href="/" aria-label="Aurelle home">Aurelle</a>
+    <nav aria-label="Main">
+      <a href="#collection">Collection</a>
+      <button type="button" id="ordersBtn" class="linklike">Orders</button>
+      <button type="button" id="bagBtn" class="bagbtn">Bag <span id="bagCount" class="count" aria-label="items in bag">0</span></button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <h1 id="heroTitle">Everyday objects, chosen with care.</h1>
+        <p>Forty pieces for the desk, the kitchen, the trail and everything between. Shipping is free over $250, and orders above $500 take 10% off.</p>
+        <a class="btn" href="#collection">Shop the collection</a>
+      </div>
+      <ul class="arches" id="arches" aria-label="Browse by category"></ul>
+    </section>
+
+    <section class="collection" id="collection" aria-labelledby="collTitle">
+      <div class="coll-head">
+        <h2 id="collTitle">The collection</h2>
+        <form class="search" id="searchForm" role="search">
+          <label class="vh" for="q">Search products</label>
+          <input id="q" name="q" type="search" placeholder="Search by name or code" autocomplete="off">
+          <button class="btn ghost" type="submit">Search</button>
+        </form>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+      <div class="more"><button type="button" class="btn ghost" id="moreBtn" hidden>Show more</button></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span class="mark small">Aurelle</span>
+    <p>A demo storefront. Orders are saved to the demo database only, and nothing is charged or shipped.</p>
+  </footer>
+
+  <dialog id="detail" class="sheet" aria-label="Product details"></dialog>
+  <dialog id="bag" class="drawer" aria-label="Your bag"></dialog>
+  <dialog id="orders" class="drawer" aria-label="Your orders"></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/app.js"></script>
+  <script src="/ui-driver.js"></script>
+</body>
+</html>
