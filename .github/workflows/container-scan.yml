@@ -1,0 +1,52 @@
+name: Container image scan
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  container-scan:
+    name: container-scan (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [storefront, inventory, payments]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t aurelle-${{ matrix.service }}:${{ github.sha }} services/${{ matrix.service }}
+
+      - name: Install Datadog Security CLI
+        run: |
+          curl -fsSL https://keys.datadoghq.com/DATADOG_APT_KEY_CURRENT.public | sudo gpg --dearmor -o /usr/share/keyrings/datadog-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ stable datadog-security-cli" | sudo tee /etc/apt/sources.list.d/datadog-security-cli.list
+          sudo apt-get update
+          sudo apt-get install -y datadog-security-cli
+
+      # Fails this job (and therefore the required check) when a high or critical vulnerability is found.
+      - name: Scan image and upload results to Datadog
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          DD_SITE: datadoghq.com
+        run: |
+          datadog-security-cli image aurelle-${{ matrix.service }}:${{ github.sha }} \
+            --dockerfile services/${{ matrix.service }}/Dockerfile \
+            --fail-on high
+
+  # Simulated deployment: only runs on main, and only when every scan above passed.
+  deploy:
+    name: deploy (simulated)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: container-scan
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: echo "Deploying ${{ github.sha }} - reached only when all image scans passed"
